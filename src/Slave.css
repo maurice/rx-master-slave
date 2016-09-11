@@ -1,0 +1,19 @@
+.slave {
+    border: 1px dotted grey;
+    min-height: 100px;
+    min-width: 150px;
+    display: inline-block;
+    margin-right: 20px;
+}
+
+.slave .header {
+    height: 30px;
+}
+
+.slave .header.is-slave {
+    background-color: royalblue;
+}
+
+.slave .body {
+    height: 100px;
+}

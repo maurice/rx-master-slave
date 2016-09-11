@@ -1,0 +1,19 @@
+.master {
+    border: 1px solid grey;
+    min-height: 100px;
+    min-width: 150px;
+    display: inline-block;
+    margin-right: 20px;
+}
+
+.master .header {
+    height: 30px;
+}
+
+.master .header.is-master {
+    background-color: royalblue;
+}
+
+.master .body {
+    height: 100px;
+}
