@@ -6,14 +6,18 @@ import './Master.css';
 export default class Master extends Component {
   constructor({ masters }) {
     super();
-     // An `Observable<Observable<change-object>>` which broadcasts the current active master, if any
+    const backgroundColor = randomRGBA(0.2);
+    // An `Observable<Observable<change-object>>` which broadcasts the current active master, if any
     this.masters = masters;
     // A `Observer<change-object>` which we own an broadcast any changes to active slaves.
     // Only set if we are the active master
-    this.slaves = null;
+    // Create a Subject (multicast Observable) with "behavior",
+    // which stores the current value so new subscribers get it whenever
+    // the appear, and with which we broadcast changes to slaves
+    this.slaves = new BehaviorSubject({ backgroundColor });
     // initial component state; just the things that trigger re-render
     this.state = {
-      backgroundColor: randomRGBA(0.2),
+      backgroundColor,
       isActive: false
     };
   }
@@ -30,14 +34,12 @@ export default class Master extends Component {
     }
   }
 
-  // change the master's background color, notify slaves, if any
+  // change the master's background color, notify slaves
   changeColor() {
     const change = { backgroundColor: randomRGBA(0.2) };
     const state = Object.assign({}, this.state, change);
     this.setState(state);
-    if (this.slaves) {
-      this.slaves.next(change);
-    }
+    this.slaves.next(change);
   }
 
   // step-up to become the current master, or step down 
@@ -55,14 +57,8 @@ export default class Master extends Component {
   }
 
   updateIsActive(isActive, andPublish) {
-    this.slaves = isActive 
-        // create a subject (multicast observable) with "behavior",
-        // which stores the current value so new subscribers get it whenever
-        // the appear
-      ? new BehaviorSubject({ backgroundColor: this.state.backgroundColor }) 
-      : null;
     if (andPublish) { // else don't overwrite another master
-      this.masters.next(this.slaves);
+      this.masters.next(isActive ? this.slaves : null);
     }
     this.setState(Object.assign({}, this.state, { isActive }));
   }
