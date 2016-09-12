@@ -6,17 +6,21 @@ import './Master.css';
 export default class Master extends Component {
   constructor({ masters }) {
     super();
+     // An `Observable<Observable<change-object>>` which broadcasts the current active master, if any
     this.masters = masters;
+    // A `Observer<change-object>` which we own an broadcast any changes to active slaves.
+    // Only set if we are the active master
     this.slaves = null;
+    // initial component state; just the things that trigger re-render
     this.state = {
       backgroundColor: randomRGBA(0.2),
-      isMaster: false
+      isActive: false
     };
   }
 
   componentDidMount() {
     // subscribe to the global stream of masters
-    this.mastersSubscription = this.masters.subscribe(this.masterChanged.bind(this));
+    this.mastersSubscription = this.masters.subscribe(this.activeMasterChanged.bind(this));
   }
 
   componentWillUnmount() {
@@ -38,34 +42,34 @@ export default class Master extends Component {
 
   // step-up to become the current master, or step down 
   toggleMaster() {
-    this.updateIsMaster(!this.state.isMaster, true);
+    this.updateIsActive(!this.state.isActive, true);
   }
 
   // handle change to master; either this master or another master has
   // has stepped-up to become current master or stepped-down
-  masterChanged(master) {
+  activeMasterChanged(master) {
     // another master has taken over?
-    if (this.state.isMaster && master && master !== this.slaves) {
-      this.updateIsMaster(false, false);
+    if (this.state.isActive && master && master !== this.slaves) {
+      this.updateIsActive(false, false);
     }
   }
 
-  updateIsMaster(isMaster, isInternal) {
-    this.slaves = isMaster 
+  updateIsActive(isActive, andPublish) {
+    this.slaves = isActive 
         // create a subject (multicast observable) with "behavior",
         // which stores the current value so new subscribers get it whenever
         // the appear
       ? new BehaviorSubject({ backgroundColor: this.state.backgroundColor }) 
       : null;
-    if (isInternal) { // else don't overwrite another master
+    if (andPublish) { // else don't overwrite another master
       this.masters.next(this.slaves);
     }
-    this.setState(Object.assign({}, this.state, { isMaster }));
+    this.setState(Object.assign({}, this.state, { isActive }));
   }
 
   render() {
     return <div className='master'>
-      <div className={'header ' + (this.state.isMaster ? 'is-master' : '')}>
+      <div className={'header ' + (this.state.isActive ? 'is-active' : '')}>
         <button onClick={this.toggleMaster.bind(this)}>O</button>
       </div>
       <div className='body' style={{ backgroundColor: this.state.backgroundColor }} onClick={this.changeColor.bind(this)}>

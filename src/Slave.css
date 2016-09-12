@@ -10,7 +10,7 @@
     height: 30px;
 }
 
-.slave .header.is-slave {
+.slave .header.is-active {
     background-color: royalblue;
 }
 

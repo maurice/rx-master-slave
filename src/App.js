@@ -13,21 +13,19 @@ import Slave from './Slave';
 //     no master
 const masters = new Rx.BehaviorSubject();
 
-const sharedProps = { masters };
-
 export default class App extends Component {
   render() {
     return (
       <div className="App">
       <div className="container">
-        <Master {...sharedProps} />
-        <Master {...sharedProps} />
-        <Master {...sharedProps} />
+        <Master masters={masters} />
+        <Master masters={masters} />
+        <Master masters={masters} />
       </div>
       <div className="container">
-        <Slave {...sharedProps} />
-        <Slave {...sharedProps} />
-        <Slave {...sharedProps} />
+        <Slave masters={masters} />
+        <Slave masters={masters} />
+        <Slave masters={masters} />
       </div>
       </div>
     );

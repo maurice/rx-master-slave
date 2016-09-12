@@ -10,7 +10,7 @@
     height: 30px;
 }
 
-.master .header.is-master {
+.master .header.is-active {
     background-color: royalblue;
 }
 
